@@ -15,17 +15,14 @@ import (
 
 func New() *cobra.Command {
 	root := cli.Command(&App{}, cobra.Command{
-		Long: "Add some long description",
+		Long: "Stupid Finalizers",
 	})
-	root.AddCommand(
-		NewSubCommand(),
-	)
 	return root
 }
 
 type App struct {
 	Namespace string `usage:"namespace" short:"n" env:"NAMESPACE"`
-	Blocked   bool   `usage:"print deleting objects blocked by finalizers"`
+	All       bool   `usage:"print all objects with finalizers"`
 	Quiet     bool   `usage:"only print IDs" short:"q"`
 	Output    string `usage:"yaml/json" short:"o"`
 }
@@ -47,7 +44,7 @@ func (a *App) Run(cmd *cobra.Command, args []string) error {
 	filters := filter.Filters{
 		filter.HasFinalizer,
 	}
-	if a.Blocked {
+	if !a.All {
 		filters = append(filters, filter.IsDeleted)
 	}
 

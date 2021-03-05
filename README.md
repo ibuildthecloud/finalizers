@@ -7,17 +7,17 @@
 ## Run
 
 ```
-# List all objects with a finalizer
+# List all objects blocked by a finalizer
 ./finalizers
 
-# List objects not deleting because of finalizers
-./finalizers --blocked
+# List all objects with finalizers
+./finalizers --all
 ```
 
 ## Example
 
 ```
-./finalizers --blocked
+./finalizers
 
 NAMESPACE   NAME                    APIVERSION                KIND                         FINALIZERS
 p-nf5gh     creator-project-owner   management.cattle.io/v3   ProjectRoleTemplateBinding   [controller.cattle.io/mgmt-auth-prtb-controller]

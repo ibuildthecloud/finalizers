@@ -1,8 +1,8 @@
 package main
 
 import (
-	cli "github.com/rancher/wrangler-cli"
 	"github.com/ibuildthecloud/finalizers/pkg/app"
+	cli "github.com/rancher/wrangler-cli"
 )
 
 func main() {
