@@ -2,6 +2,7 @@ package app
 
 import (
 	"os"
+	"path"
 
 	"github.com/ibuildthecloud/finalizers/pkg/filter"
 	"github.com/ibuildthecloud/finalizers/pkg/world"
@@ -15,20 +16,23 @@ import (
 
 func New() *cobra.Command {
 	root := cli.Command(&App{}, cobra.Command{
+		Use:  path.Base(os.Args[0]),
 		Long: "Stupid Finalizers",
 	})
 	return root
 }
 
 type App struct {
-	Namespace string `usage:"namespace" short:"n" env:"NAMESPACE"`
-	All       bool   `usage:"print all objects with finalizers"`
-	Quiet     bool   `usage:"only print IDs" short:"q"`
-	Output    string `usage:"yaml/json" short:"o"`
+	Namespace  string `usage:"namespace" short:"n" env:"NAMESPACE"`
+	All        bool   `usage:"print all objects with finalizers"`
+	Quiet      bool   `usage:"only print IDs" short:"q"`
+	Output     string `usage:"yaml/json" short:"o"`
+	Kubeconfig string `usage:"Location of kubeconfig" env:"KUBECONFIG"`
+	Context    string `usage:"Context to use" env:"CONTEXT"`
 }
 
 func (a *App) Run(cmd *cobra.Command, args []string) error {
-	clientConfig := kubeconfig.GetClientConfigWithContext("", "", os.Stdin)
+	clientConfig := kubeconfig.GetClientConfigWithContext(a.Kubeconfig, a.Context, os.Stdin)
 	restConfig, err := clientConfig.ClientConfig()
 	if err != nil {
 		return err
