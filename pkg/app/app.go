@@ -24,7 +24,7 @@ func New() *cobra.Command {
 
 type App struct {
 	Namespace  string `usage:"namespace" short:"n" env:"NAMESPACE"`
-	All        bool   `usage:"print all objects with finalizers"`
+	All        bool   `usage:"print all objects with finalizers" short:"a"`
 	Quiet      bool   `usage:"only print IDs" short:"q"`
 	Output     string `usage:"yaml/json" short:"o"`
 	Kubeconfig string `usage:"Location of kubeconfig" env:"KUBECONFIG"`
