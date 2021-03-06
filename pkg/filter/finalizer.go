@@ -3,6 +3,7 @@ package filter
 import (
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime"
+	"time"
 )
 
 type Filter func(object runtime.Object) runtime.Object
@@ -43,4 +44,25 @@ func IsDeleted(obj runtime.Object) runtime.Object {
 	}
 
 	return obj
+}
+
+func IsDeletedOutsideWindow(window time.Duration) func(obj runtime.Object) runtime.Object {
+	return func(obj runtime.Object) runtime.Object {
+		m, err := meta.Accessor(obj)
+		if err != nil {
+			return nil
+		}
+
+		deletion := m.GetDeletionTimestamp()
+
+		if deletion == nil {
+			return nil
+		}
+
+		if time.Since(deletion.Time) < window {
+			return nil
+		}
+
+		return obj
+	}
 }

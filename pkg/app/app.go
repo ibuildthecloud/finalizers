@@ -1,17 +1,18 @@
 package app
 
 import (
-	"os"
-	"path"
-
 	"github.com/ibuildthecloud/finalizers/pkg/filter"
 	"github.com/ibuildthecloud/finalizers/pkg/world"
 	cli "github.com/rancher/wrangler-cli"
 	"github.com/rancher/wrangler-cli/pkg/table"
 	"github.com/rancher/wrangler/pkg/data/convert"
 	"github.com/rancher/wrangler/pkg/kubeconfig"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/runtime"
+	"os"
+	"path"
+	"time"
 )
 
 func New() *cobra.Command {
@@ -23,12 +24,13 @@ func New() *cobra.Command {
 }
 
 type App struct {
-	Namespace  string `usage:"namespace" short:"n" env:"NAMESPACE"`
-	All        bool   `usage:"print all objects with finalizers" short:"a"`
-	Quiet      bool   `usage:"only print IDs" short:"q"`
-	Output     string `usage:"yaml/json" short:"o"`
-	Kubeconfig string `usage:"Location of kubeconfig" env:"KUBECONFIG"`
-	Context    string `usage:"Context to use" env:"CONTEXT"`
+	All                bool   `usage:"print all objects with finalizers" short:"a"`
+	Context            string `usage:"Context to use" env:"CONTEXT"`
+	Kubeconfig         string `usage:"Location of kubeconfig" env:"KUBECONFIG"`
+	Namespace          string `usage:"namespace" short:"n" env:"NAMESPACE"`
+	Output             string `usage:"yaml/json" short:"o"`
+	ExcludeSinceWindow string `usage:"exclude objects since [duration]" short:"e" default:"0" env:"EXCLUDE_SINCE_WINDOW"`
+	Quiet              bool   `usage:"only print IDs" short:"q"`
 }
 
 func (a *App) Run(cmd *cobra.Command, args []string) error {
@@ -49,7 +51,11 @@ func (a *App) Run(cmd *cobra.Command, args []string) error {
 		filter.HasFinalizer,
 	}
 	if !a.All {
-		filters = append(filters, filter.IsDeleted)
+		t, err := time.ParseDuration(a.ExcludeSinceWindow)
+		if err != nil {
+			logrus.Fatalf("unable to parse 'past' time: %s", err.Error())
+		}
+		filters = append(filters, filter.IsDeletedOutsideWindow(t))
 	}
 
 	w := table.NewWriter([][]string{
