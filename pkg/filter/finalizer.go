@@ -33,19 +33,6 @@ func HasFinalizer(obj runtime.Object) runtime.Object {
 	return obj
 }
 
-func IsDeleted(obj runtime.Object) runtime.Object {
-	m, err := meta.Accessor(obj)
-	if err != nil {
-		return nil
-	}
-
-	if m.GetDeletionTimestamp() == nil {
-		return nil
-	}
-
-	return obj
-}
-
 func IsDeletedOutsideWindow(window time.Duration) func(obj runtime.Object) runtime.Object {
 	return func(obj runtime.Object) runtime.Object {
 		m, err := meta.Accessor(obj)
