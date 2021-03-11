@@ -12,6 +12,7 @@ import (
 	"github.com/rancher/wrangler/pkg/kubeconfig"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/runtime"
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
 )
 
 func New() *cobra.Command {
