@@ -97,7 +97,7 @@ func (t *Trip) Wander(ctx context.Context, traveler Traveler) error {
 				}
 			}
 			if !listable {
-				break
+				continue
 			}
 
 			if t.namespace != "" && !api2.Namespaced {

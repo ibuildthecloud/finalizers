@@ -1,6 +1,10 @@
 package app
 
 import (
+	"os"
+	"path"
+	"time"
+
 	"github.com/ibuildthecloud/finalizers/pkg/filter"
 	"github.com/ibuildthecloud/finalizers/pkg/world"
 	cli "github.com/rancher/wrangler-cli"
@@ -10,9 +14,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/runtime"
-	"os"
-	"path"
-	"time"
 )
 
 func New() *cobra.Command {
@@ -25,6 +26,7 @@ func New() *cobra.Command {
 
 type App struct {
 	All                bool   `usage:"print all objects with finalizers" short:"a"`
+	Everything         bool   `usage:"print all objects regardless of finalizers" short:"f"`
 	Context            string `usage:"Context to use" env:"CONTEXT"`
 	Kubeconfig         string `usage:"Location of kubeconfig" env:"KUBECONFIG"`
 	Namespace          string `usage:"namespace" short:"n" env:"NAMESPACE"`
@@ -56,6 +58,10 @@ func (a *App) Run(cmd *cobra.Command, args []string) error {
 			logrus.Fatalf("unable to parse 'past' time: %s", err.Error())
 		}
 		filters = append(filters, filter.IsDeletedOutsideWindow(t))
+	}
+
+	if a.Everything {
+		filters = nil
 	}
 
 	w := table.NewWriter([][]string{
