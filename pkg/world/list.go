@@ -115,6 +115,9 @@ func (t *Trip) Wander(ctx context.Context, traveler Traveler) error {
 				client = t.dynamic.Resource(gvr).Namespace(t.namespace)
 			}
 
+			// capture values for goroutine
+			api := api
+			api2 := api2
 			eg.Go(func() error {
 				if err := t.listAll(ctx, traveler, client, api, api2); err != nil {
 					logrus.Warn("Failed to list", api.GroupVersion, api2.Kind, err)
